@@ -65,16 +65,26 @@ export default function App() {
     }
   }
 
+  // FIXED: backend's /api/auth/login uses OAuth2PasswordRequestForm,
+  // which expects application/x-www-form-urlencoded with a "username"
+  // field (not JSON with "email"). This bypasses the shared request()
+  // helper since that always sends JSON.
   async function login(e) {
     e.preventDefault();
     try {
-      const data = await request("/api/auth/login", {
+      const body = new URLSearchParams();
+      body.set("username", authForm.email);
+      body.set("password", authForm.password);
+
+      const response = await fetch(API + "/api/auth/login", {
         method: "POST",
-        body: JSON.stringify({
-          email: authForm.email,
-          password: authForm.password,
-        }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
       });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) throw new Error(data.detail || "Login failed");
+
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("role", data.role);
       localStorage.setItem("name", data.name);

@@ -1,99 +1,72 @@
 # Car Dealership Inventory System
 
-A simple full-stack Car Dealership Inventory System built for the TDD Kata.
+This is a full-stack inventory app for a car dealership — built as a TDD kata assignment. Backend is FastAPI + SQLite, frontend is React + Tailwind. It handles user login/registration with two roles (Admin and regular User), lets admins manage the vehicle inventory, and lets any logged-in user browse, search, and "purchase" vehicles.
+
+## Tech Stack
+
+**Backend:** FastAPI, SQLAlchemy, SQLite, JWT (python-jose), Pydantic
+**Frontend:** React, Vite, Tailwind CSS
+**Testing:** pytest, httpx, pytest-cov
 
 ## Features
 
-- User registration and login
-- JWT token authentication
-- SQLite persistent database
-- Protected vehicle APIs
-- Vehicle search by make, model, category and price range
-- Purchase decreases stock
-- Purchase button is disabled when stock is zero
-- Admin-only delete and restock
-- Admin add and update vehicle UI
-- React single-page frontend
-- Tailwind CSS responsive styling
-- Automated pytest backend tests
-- Git/TDD workflow
-- Transparent AI usage documentation
-
-## Technology Stack
-
-### Backend
-- Python
-- FastAPI
-- SQLAlchemy
-- SQLite
-- JWT
-- pytest
-
-### Frontend
-- React
-- Vite
-- Tailwind CSS
-- HTML5/CSS3
+- Register/login with JWT auth
+- First person to register becomes ADMIN automatically, everyone after that is a regular USER
+- Admins can add, edit, delete, and restock vehicles
+- Anyone logged in can browse, search, and purchase vehicles
+- Search/filter by make, model, category, price range
+- Purchase button disables itself once a vehicle hits zero stock
 
 ## Project Structure
 
-```text
-backend/     FastAPI REST API, database and tests
-frontend/    React + Tailwind SPA
-screenshots/ Final application screenshots
-PROMPTS.md   Raw AI prompts/chat log documentation
+```
+car-dealership-inventory/
+├── backend/
+│   ├── app/
+│   │   ├── main.py          # FastAPI app entrypoint
+│   │   ├── routers.py       # All API routes
+│   │   ├── schemas.py       # Pydantic request/response models
+│   │   ├── models.py        # SQLAlchemy ORM models
+│   │   ├── database.py      # DB engine/session setup
+│   │   ├── auth.py          # Password hashing, JWT creation
+│   │   └── dependencies.py  # get_current_user auth dependency
+│   ├── tests/
+│   │   ├── conftest.py      # Pytest fixtures (isolated in-memory test DB)
+│   │   └── test_api.py      # Full API test suite (27 tests)
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+├── README.md
+└── PROMPTS.md
 ```
 
-## API Endpoints
+## Setup & Running Locally
 
-| Method | Endpoint | Access |
-|---|---|---|
-| POST | `/api/auth/register` | Public |
-| POST | `/api/auth/login` | Public |
-| POST | `/api/vehicles` | Authenticated |
-| GET | `/api/vehicles` | Authenticated |
-| GET | `/api/vehicles/search` | Authenticated |
-| PUT | `/api/vehicles/{id}` | Authenticated |
-| DELETE | `/api/vehicles/{id}` | Admin |
-| POST | `/api/vehicles/{id}/purchase` | Authenticated |
-| POST | `/api/vehicles/{id}/restock` | Admin |
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
 
-## Database
-
-The project uses SQLite stored in `backend/dealership.db`. This is a persistent database file and is not an in-memory database.
-
-## Authentication
-
-Registration and login are implemented with JWT token authentication.
-
-For simple evaluation, the first registered account is assigned the `ADMIN` role. Later accounts are normal `USER` accounts. This makes it easy to demonstrate both admin and normal-user functionality.
-
-## Backend Setup
+### Backend
 
 ```bash
 cd backend
-
 python -m venv venv
-
-# Windows
-venv\Scripts\activate
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # macOS/Linux
 
 pip install -r requirements.txt
-
 uvicorn app.main:app --reload
 ```
 
-Backend:
+The API will be available at `http://127.0.0.1:8000`. Interactive docs (Swagger) at `http://127.0.0.1:8000/docs`.
 
-`http://localhost:8000`
-
-Swagger API documentation:
-
-`http://localhost:8000/docs`
-
-## Frontend Setup
-
-Open another terminal:
+### Frontend
 
 ```bash
 cd frontend
@@ -101,134 +74,98 @@ npm install
 npm run dev
 ```
 
-Frontend:
+The app will be available at `http://localhost:5173`.
 
-`http://localhost:5173`
-
-## Running Tests
-
-From the backend directory:
+### Running Tests
 
 ```bash
+cd backend
 pytest -v
 ```
 
-For coverage:
+To include a coverage report:
 
 ```bash
-pytest --cov=app --cov-report=term-missing
+pytest -v --cov=app
 ```
 
-## TDD Approach
+## API Endpoints
 
-The backend was developed using a Red-Green-Refactor approach.
-
-1. Tests were written first for the required behavior.
-2. The tests initially failed because the corresponding implementation did not exist.
-3. The minimum implementation was added to make the tests pass.
-4. The implementation was then cleaned up and manually verified.
-5. Git commits document the test and implementation stages.
-
-The main tested behaviors include:
-
-- Registration and login
-- Duplicate registration
-- Protected endpoints
-- Vehicle creation
-- Vehicle search
-- Vehicle update
-- Vehicle purchase
-- Out-of-stock purchase rejection
-- Admin restocking
-- Admin deletion
-- Normal-user restriction for admin operations
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| POST | `/api/auth/register` | — | Register a new user |
+| POST | `/api/auth/login` | — | Log in, returns JWT |
+| GET | `/api/vehicles` | Any user | List all vehicles |
+| POST | `/api/vehicles` | Admin | Add a vehicle |
+| GET | `/api/vehicles/search` | Any user | Search/filter vehicles |
+| PUT | `/api/vehicles/{id}` | Admin | Update a vehicle |
+| DELETE | `/api/vehicles/{id}` | Admin | Delete a vehicle |
+| POST | `/api/vehicles/{id}/purchase` | Any user | Purchase (decrease quantity) |
+| POST | `/api/vehicles/{id}/restock` | Admin | Restock (increase quantity) |
 
 ## Test Report
 
-Run:
+27 tests, all passing. Covers registration, login, JWT auth, the full vehicle CRUD, search filters, purchase/restock (including out-of-stock and bad-quantity edge cases), and permission checks for both roles.
 
-```bash
-pytest -v
 ```
+==================== test session starts ====================
+platform win32 -- Python 3.13.3, pytest-8.4.1, pluggy-1.6.0
+collected 27 items
 
-Then copy the actual terminal result here before submission.
+tests/test_api.py::test_first_registered_user_becomes_admin PASSED
+tests/test_api.py::test_second_registered_user_becomes_regular_user PASSED
+tests/test_api.py::test_cannot_register_duplicate_email PASSED
+tests/test_api.py::test_registration_rejects_short_password PASSED
+tests/test_api.py::test_login_with_correct_credentials PASSED
+tests/test_api.py::test_login_with_wrong_password_fails PASSED
+tests/test_api.py::test_login_with_unknown_email_fails PASSED
+tests/test_api.py::test_list_vehicles_requires_authentication PASSED
+tests/test_api.py::test_admin_can_create_vehicle PASSED
+tests/test_api.py::test_regular_user_cannot_create_vehicle PASSED
+tests/test_api.py::test_regular_user_can_list_vehicles PASSED
+tests/test_api.py::test_update_vehicle PASSED
+tests/test_api.py::test_regular_user_cannot_update_vehicle PASSED
+tests/test_api.py::test_update_nonexistent_vehicle_returns_404 PASSED
+tests/test_api.py::test_admin_can_delete_vehicle PASSED
+tests/test_api.py::test_regular_user_cannot_delete_vehicle PASSED
+tests/test_api.py::test_delete_nonexistent_vehicle_returns_404 PASSED
+tests/test_api.py::test_search_by_make PASSED
+tests/test_api.py::test_search_by_price_range PASSED
+tests/test_api.py::test_search_with_no_matches_returns_empty_list PASSED
+tests/test_api.py::test_purchase_decreases_quantity_by_one PASSED
+tests/test_api.py::test_regular_user_can_purchase PASSED
+tests/test_api.py::test_cannot_purchase_out_of_stock_vehicle PASSED
+tests/test_api.py::test_purchase_nonexistent_vehicle_returns_404 PASSED
+tests/test_api.py::test_admin_can_restock PASSED
+tests/test_api.py::test_regular_user_cannot_restock PASSED
+tests/test_api.py::test_restock_rejects_zero_or_negative_quantity PASSED
 
-Example format:
-
-```text
-Tests passed: 7
-Tests failed: 0
+=============== 27 passed in 8.23s ================
 ```
-
-Do not claim a test count that was not actually run.
 
 ## Screenshots
 
-Add final screenshots to the `screenshots/` directory and reference them here.
-
-Recommended screenshots:
-
-1. Login/Register screen
-2. Vehicle dashboard
-3. Search/filter results
-4. Admin controls
-5. Swagger API documentation
-6. Passing pytest output
+_[Add screenshots here: login page, register page, vehicle dashboard (admin view), vehicle dashboard (user view), search results, add/edit vehicle form]_
 
 ## My AI Usage
 
-### Tool Used
+I used Claude (Anthropic) through the claude.ai chat interface for most of this project. Full raw chat log is in `PROMPTS.md` at the repo root.
 
-I used ChatGPT as an AI development assistant.
+**What I actually used it for:**
 
-### How I Used AI
+I built the backend and frontend mostly on my own first, then leaned on Claude heavily once I got to the testing/debugging phase, since that's where I got stuck. I went through every endpoint manually in Swagger with Claude walking me through it step by step — register, login, list, search, update, delete, purchase, restock. A few things that looked like backend bugs at first turned out to just be me messing up the testing (submitting Swagger's placeholder text by accident, double-clicking Execute and doubling up a purchase/restock). Claude had me check the raw uvicorn terminal logs each time, which is how we actually figured out what was going on instead of guessing.
 
-I used ChatGPT to:
+The most useful catch was a real bug: my frontend's login function was sending JSON with an `email` field, but my backend's login route uses FastAPI's OAuth2PasswordRequestForm, which needs form-urlencoded data with a `username` field instead. That's why login worked fine in Swagger but would've silently broken on the actual site. Claude spotted the mismatch and fixed just that one function.
 
-- plan a simple architecture that satisfied the assignment requirements
-- discuss REST API endpoint design
-- create an initial TDD test plan
-- generate initial boilerplate code
-- help debug errors during implementation
-- review the project against the assignment requirements
-- suggest simple React and Tailwind UI structure
-- help prepare README documentation
+I also had Claude write the pytest suite for me (I hadn't written backend tests before), covering auth, all the vehicle CRUD, search, purchase, restock, and the admin-vs-user permission checks — 27 tests total. One of the generated tests failed at first (expected a 400 on a bad restock quantity, got a 422 instead), and it turned out the test was wrong, not the code — my Pydantic schema already validates quantity > 0 before the route logic even runs, so FastAPI rejects it earlier with a 422. Fixed the test assertion once that was clear.
 
-I manually reviewed and tested the generated suggestions and changed code when necessary.
+Claude also helped me draft this README and pointed out gaps in what I'd need for the actual submission (AI usage section, PROMPTS.md, the TDD requirement) that I hadn't fully read into the brief.
 
-### Reflection
+**Honest reflection:**
 
-AI reduced the time needed to create repetitive boilerplate and helped identify missing requirements. It was particularly useful for creating test cases and checking that the API and frontend covered the assignment.
+This wasn't really Test-Driven Development in the way the brief describes it. I built the features first and added tests afterward with Claude's help, rather than writing a failing test before each piece of code (red-green-refactor). I'm saying that plainly here instead of trying to dress it up — I understand that's a real gap against what was asked for, and if I did this again I'd write the failing test first for each endpoint before touching the implementation.
 
-I did not treat AI output as automatically correct. I ran the application, tested the API, ran the test suite, and manually reviewed the implementation.
+AI was genuinely useful for debugging faster than I could've on my own, especially the login bug, since that would've taken me a while to catch by just staring at the browser. But it also means a good chunk of this codebase and all of the tests were AI-assisted rather than written solo, which I'd rather be upfront about than pretend otherwise.
 
-## Git Workflow
 
-The project uses small, descriptive commits. TDD commits show the test-first development process.
 
-Example:
-
-```text
-test: add authentication tests
-feat: implement authentication
-test: add vehicle inventory tests
-feat: implement vehicle inventory
-feat: implement React dashboard
-docs: add README and AI usage documentation
-```
-
-For commits where AI was used, the commit message includes the required AI co-author trailer.
-
-## AI Prompt Log
-
-Raw AI prompts and responses used during development are documented in `PROMPTS.md` as required by the assignment.
-
-## Future Improvements
-
-- PostgreSQL for production
-- Refresh tokens
-- Better role management
-- Vehicle images
-- Deployment
-- Pagination
-- Advanced inventory reporting
