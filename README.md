@@ -149,11 +149,13 @@ _[Add screenshots here: login page, register page, vehicle dashboard (admin view
 
 ## My AI Usage
 
-I used Claude (Anthropic) through the claude.ai chat interface for most of this project. Full raw chat log is in `PROMPTS.md` at the repo root.
+I used two AI tools on this project: **ChatGPT** and **Claude** (Anthropic, via the claude.ai chat interface). The full raw chat log with Claude is in `PROMPTS.md` at the repo root.
 
-**What I actually used it for:**
+**ChatGPT — initial scaffolding and API endpoint checking:**
+I used ChatGPT early on to help scaffold the initial backend and frontend structure, and to check/sanity-test the API endpoints as I was first building them out.
 
-I built the backend and frontend mostly on my own first, then leaned on Claude heavily once I got to the testing/debugging phase, since that's where I got stuck. I went through every endpoint manually in Swagger with Claude walking me through it step by step — register, login, list, search, update, delete, purchase, restock. A few things that looked like backend bugs at first turned out to just be me messing up the testing (submitting Swagger's placeholder text by accident, double-clicking Execute and doubling up a purchase/restock). Claude had me check the raw uvicorn terminal logs each time, which is how we actually figured out what was going on instead of guessing.
+**Claude — debugging and testing:**
+I leaned on Claude heavily once I got to the testing/debugging phase, since that's where I got stuck. I went through every endpoint manually in Swagger with Claude walking me through it step by step — register, login, list, search, update, delete, purchase, restock. A few things that looked like backend bugs at first turned out to just be me messing up the testing (submitting Swagger's placeholder text by accident, double-clicking Execute and doubling up a purchase/restock). Claude had me check the raw uvicorn terminal logs each time, which is how we actually figured out what was going on instead of guessing.
 
 The most useful catch was a real bug: my frontend's login function was sending JSON with an `email` field, but my backend's login route uses FastAPI's OAuth2PasswordRequestForm, which needs form-urlencoded data with a `username` field instead. That's why login worked fine in Swagger but would've silently broken on the actual site. Claude spotted the mismatch and fixed just that one function.
 
@@ -163,9 +165,6 @@ Claude also helped me draft this README and pointed out gaps in what I'd need fo
 
 **Honest reflection:**
 
-This wasn't really Test-Driven Development in the way the brief describes it. I built the features first and added tests afterward with Claude's help, rather than writing a failing test before each piece of code (red-green-refactor). I'm saying that plainly here instead of trying to dress it up — I understand that's a real gap against what was asked for, and if I did this again I'd write the failing test first for each endpoint before touching the implementation.
+This wasn't really Test-Driven Development in the way the brief describes it. I built the features first with ChatGPT's help, then added tests afterward with Claude's help, rather than writing a failing test before each piece of code (red-green-refactor). I'm saying that plainly here instead of trying to dress it up — I understand that's a real gap against what was asked for, and if I did this again I'd write the failing test first for each endpoint before touching the implementation.
 
 AI was genuinely useful for debugging faster than I could've on my own, especially the login bug, since that would've taken me a while to catch by just staring at the browser. But it also means a good chunk of this codebase and all of the tests were AI-assisted rather than written solo, which I'd rather be upfront about than pretend otherwise.
-
-
-
