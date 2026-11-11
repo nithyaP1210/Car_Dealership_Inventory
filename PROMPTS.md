@@ -1,19 +1,28 @@
-# PROMPTS.md
+###### &#x20;  # AI Prompts \& Chat Logs
 
-This file is reserved for the raw, unedited AI prompts and responses used during development.
 
-The assignment requires raw chat logs or public chat links, not AI-generated summaries.
 
-Paste the actual ChatGPT/Copilot/Gemini conversations used for this project below.
 
-## ChatGPT Conversation 1
 
-PASTE RAW CHAT LOG HERE.
+&#x20;  Full conversation with Claude (Anthropic) for this project:
 
-## ChatGPT Conversation 2
 
-PASTE RAW CHAT LOG HERE.
 
-## Additional AI Conversations
+&#x20;  https://claude.ai/share/473e2006-4bdd-479d-8200-3b9f7963fe46
 
-PASTE RAW CHAT LOGS HERE.
+
+
+&#x20;  Full conversation with Claude (Anthropic) for this project:
+
+&#x20;   
+
+&#x20;  https://chatgpt.com/share/6a8afc95-0fbc-83ee-bebf-8b9a9cfe8636
+
+
+
+
+
+
+
+
+
