@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API = "http://localhost:8000";
+const API = "https://car-dealership-inventory-sdcm.onrender.com";
 
 const emptyVehicle = {
   make: "",

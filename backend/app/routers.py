@@ -21,6 +21,7 @@ from .dependencies import get_current_user
 
 router = APIRouter()
 
+
 # AUTHENTICATION
 @router.post("/api/auth/register", status_code=201)
 def register(
