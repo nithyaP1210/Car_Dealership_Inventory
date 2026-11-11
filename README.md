@@ -143,28 +143,4 @@ tests/test_api.py::test_restock_rejects_zero_or_negative_quantity PASSED
 =============== 27 passed in 8.23s ================
 ```
 
-## Screenshots
 
-_[Add screenshots here: login page, register page, vehicle dashboard (admin view), vehicle dashboard (user view), search results, add/edit vehicle form]_
-
-## My AI Usage
-
-I used two AI tools on this project: **ChatGPT** and **Claude** (Anthropic, via the claude.ai chat interface). The full raw chat log with Claude is in `PROMPTS.md` at the repo root.
-
-**ChatGPT — initial scaffolding and API endpoint checking:**
-I used ChatGPT early on to help scaffold the initial backend and frontend structure, and to check/sanity-test the API endpoints as I was first building them out.
-
-**Claude — debugging and testing:**
-I leaned on Claude heavily once I got to the testing/debugging phase, since that's where I got stuck. I went through every endpoint manually in Swagger with Claude walking me through it step by step — register, login, list, search, update, delete, purchase, restock. A few things that looked like backend bugs at first turned out to just be me messing up the testing (submitting Swagger's placeholder text by accident, double-clicking Execute and doubling up a purchase/restock). Claude had me check the raw uvicorn terminal logs each time, which is how we actually figured out what was going on instead of guessing.
-
-The most useful catch was a real bug: my frontend's login function was sending JSON with an `email` field, but my backend's login route uses FastAPI's OAuth2PasswordRequestForm, which needs form-urlencoded data with a `username` field instead. That's why login worked fine in Swagger but would've silently broken on the actual site. Claude spotted the mismatch and fixed just that one function.
-
-I also had Claude write the pytest suite for me (I hadn't written backend tests before), covering auth, all the vehicle CRUD, search, purchase, restock, and the admin-vs-user permission checks — 27 tests total. One of the generated tests failed at first (expected a 400 on a bad restock quantity, got a 422 instead), and it turned out the test was wrong, not the code — my Pydantic schema already validates quantity > 0 before the route logic even runs, so FastAPI rejects it earlier with a 422. Fixed the test assertion once that was clear.
-
-Claude also helped me draft this README and pointed out gaps in what I'd need for the actual submission (AI usage section, PROMPTS.md, the TDD requirement) that I hadn't fully read into the brief.
-
-**Honest reflection:**
-
-This wasn't really Test-Driven Development in the way the brief describes it. I built the features first with ChatGPT's help, then added tests afterward with Claude's help, rather than writing a failing test before each piece of code (red-green-refactor). I'm saying that plainly here instead of trying to dress it up — I understand that's a real gap against what was asked for, and if I did this again I'd write the failing test first for each endpoint before touching the implementation.
-
-AI was genuinely useful for debugging faster than I could've on my own, especially the login bug, since that would've taken me a while to catch by just staring at the browser. But it also means a good chunk of this codebase and all of the tests were AI-assisted rather than written solo, which I'd rather be upfront about than pretend otherwise.
